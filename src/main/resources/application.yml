@@ -10,6 +10,13 @@ spring:
       url: jdbc:mysql://localhost:3306/reggie?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: root
       password: 333
+
+  # 配置redis
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 333
+    database: 0
   # 配置QQ邮箱
   mail:
     host: smtp.qq.com
