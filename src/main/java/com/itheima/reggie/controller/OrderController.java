@@ -104,8 +104,7 @@ public class OrderController {
 
 				Dish dish = dishService.getById(dishId);
 				BeanUtils.copyProperties(dish,dto);
-				BeanUtils.copyProperties(od.getNumber(),dto.getCopies());
-
+				// BeanUtils.copyProperties(od.getNumber(),dto.getCopies());
 
 				Long categoryId = dto.getCategoryId();
 				//根据id查询分类对象
@@ -146,7 +145,7 @@ public class OrderController {
 		LambdaQueryWrapper<Dish> lqw = new LambdaQueryWrapper<>();
 		//  //添加条件，查询状态为1（起售状态）的菜品
 		lqw.eq(Dish::getStatus,1);
-		lqw.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+		lqw.orderByAsc(Dish::getSort).orderByDesc(Dish::getPrice).orderByDesc(Dish::getUpdateTime);
 
 		dishService.page(p,lqw);
 
@@ -173,5 +172,4 @@ public class OrderController {
 		return dishDtoList;
 	}
 
-	// private List<>
 }
