@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +39,7 @@ public class SetmealController {
 	@Autowired
 	private CategoryService categoryService;
 
+	@CacheEvict(value = "setmealCahe",allEntries = true)
 	@PostMapping
 	public Result<String> save(@RequestBody SetmealDto setmealDto) {
 		log.info("套餐信息：{}",setmealDto);
@@ -91,6 +94,7 @@ public class SetmealController {
 		return Result.success(setmealDto);
 	}
 
+	@CacheEvict(value = "setmealCahe",allEntries = true)
 	@PutMapping
 	public Result<String> update(@RequestBody SetmealDto setmealDto) {
 		log.info("修改套餐{}",setmealDto);
@@ -112,6 +116,7 @@ public class SetmealController {
 		return Result.error("删除套餐失败");
 	}
 
+	@CacheEvict(value = "setmealCahe",allEntries = true)
 	@PostMapping("/status/{state}")
 	public Result<String> status(@PathVariable Integer state,@RequestParam List<Long> ids) {
 		log.info("状态{},启停售ids{}",state,ids);
@@ -119,6 +124,9 @@ public class SetmealController {
 		List<Setmeal> setmealList = new ArrayList<>();
 		for (Long id : ids) {
 			Setmeal sm = new Setmeal();
+			// 不是硬编码要直接删除缓存
+			// Setmeal setmeal = setmealService.getById(id);
+			// Long categoryId = setmeal.getCategoryId();
 			sm.setStatus(state);
 			sm.setId(id);
 			setmealList.add(sm);
@@ -127,6 +135,7 @@ public class SetmealController {
 		return Result.success(flag ? "状态已更新" : "更新状态失败");
 	}
 
+	@Cacheable(value = "setmealCahe",key = "'setmeal_' + #setmeal.categoryId")
 	@GetMapping("/list")
 	public Result<List<Setmeal>> listResult(Setmeal setmeal) {
 

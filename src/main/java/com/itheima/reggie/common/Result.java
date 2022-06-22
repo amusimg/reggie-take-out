@@ -2,6 +2,7 @@ package com.itheima.reggie.common;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +13,10 @@ import java.util.Map;
  * description
  */
 @Data
-public class Result<T> {
+public class Result<T> implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private Integer code; // 1成功， 0和其他皆失败
     private T data;
     private String msg;
