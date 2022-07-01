@@ -3,12 +3,14 @@ package com.itheima.reggie.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.Result;
 import com.itheima.reggie.domain.Employee;
 import com.itheima.reggie.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +35,6 @@ public class EmployeeController {
     public Result<Employee> login(HttpServletRequest request,@RequestBody Employee employee) {
 
         String password = DigestUtils.md5DigestAsHex(employee.getPassword().getBytes());
-        String username = employee.getUsername();
 
         //2、根据页面提交的用户名username查询数据库
         LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
@@ -69,7 +70,13 @@ public class EmployeeController {
 
     @PostMapping
     public Result<String> addEmployee(HttpServletRequest req,@RequestBody Employee emp) {
-        System.out.println("进入到添加员工" + emp + LocalDateTime.now());
+        System.out.println("进入到添加员工" + emp + LocalDateTime.now() + "-s--s-s-s-" + BaseContext.getCurrentId());
+
+        Long id = (Long) req.getSession().getAttribute("employee");
+        if (id != 1) {
+            return Result.error("新增员工失败，没有管理员权限");
+        }
+
         log.info(emp.toString());
         String password = DigestUtils.md5DigestAsHex("123456".getBytes());
         emp.setPassword(password);
@@ -81,12 +88,9 @@ public class EmployeeController {
         // emp.setCreateUser(empId);
         // emp.setUpdateUser(empId);
 
-         boolean flag = employeeService.save(emp);
+         employeeService.save(emp);
+         return Result.success("新增员工成功");
 
-         if (flag) {
-             return Result.success("新增员工成功");
-         }
-         return Result.error("新增员工失败");
     }
 
 
@@ -121,20 +125,19 @@ public class EmployeeController {
     public Result<String> updateEmp(HttpServletRequest req, @RequestBody Employee emp) {
         log.info(emp.toString());
 
-        long id = Thread.currentThread().getId();
-        log.info("线程id为：{}",id);
+        // long id = Thread.currentThread().getId();
+        // log.info("线程id为：{}",id);
+
+        Long empId = (Long) req.getSession().getAttribute("employee");
+        if (empId != 1) {
+            return Result.error("修改失败，没有管理员权限！");
+        }
 
         // Long empId = (Long) req.getSession().getAttribute("employee");
         // emp.setUpdateTime(LocalDateTime.now());
         // emp.setUpdateUser(empId);
-
-        boolean flag = employeeService.updateById(emp);
-
-        if (flag) {
-            return Result.success("员工信息修改成功！");
-        }
-        return Result.error("修改失败！");
-
+        employeeService.updateById(emp);
+        return Result.success("员工信息修改成功！");
     }
 
     /**
@@ -145,6 +148,10 @@ public class EmployeeController {
     @GetMapping("/{id}")
     public Result<Employee> getById(@PathVariable Long id){
         log.info("根据id查询员工信息...");
+
+        // if (BaseContext.getCurrentId() != 1) {
+        //     return Result.error("没有查询到对应员工信息");
+        // }
         Employee employee = employeeService.getById(id);
         if(employee != null){
             return Result.success(employee);

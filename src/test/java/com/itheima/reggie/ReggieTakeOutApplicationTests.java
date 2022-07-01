@@ -1,5 +1,6 @@
 package com.itheima.reggie;
 
+import com.itheima.reggie.controller.CommonController;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -16,4 +17,9 @@ class ReggieTakeOutApplicationTests {
 		System.out.println(bytes);
 	}
 
+	@Test
+	public void testPath() {
+		String path2 = CommonController.class.getResource("classpath:").getPath();
+		System.out.println(path2);
+	}
 }

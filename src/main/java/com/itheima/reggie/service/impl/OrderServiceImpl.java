@@ -91,7 +91,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper,Orders> implements
 		orders.setCheckoutTime(LocalDateTime.now());
 		orders.setStatus(2);
 		orders.setAmount(new BigDecimal(amount.get()));//总金额
-		orders.setNumber(number);
+		orders.setNumber(String.valueOf(orderId));
 		orders.setConsignee(addressBook.getConsignee());
 		orders.setPhone(addressBook.getPhone());
 		orders.setAddress((addressBook.getProvinceName() == null ? "" : addressBook.getProvinceName())

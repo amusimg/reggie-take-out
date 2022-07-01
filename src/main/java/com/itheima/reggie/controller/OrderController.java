@@ -12,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,20 +58,56 @@ public class OrderController {
 		return Result.error("支付失败，请重试");
 	}
 
-	@GetMapping("/userPage")
-	public Result<Page> pageResult(int page,int pageSize) {
+
+	@GetMapping(value = {"/userPage","/page"})
+	public Result<Page> pageResult(int page, int pageSize, String number, String beginTime,String endTime) {
 
 		Page ordersPage = new Page(page,pageSize);
-		Long currentId = BaseContext.getCurrentId();
+		// Long currentId = BaseContext.getCurrentId();
 
 		LambdaQueryWrapper<Orders> lqw = new LambdaQueryWrapper<Orders>();
-		lqw.eq(currentId != null,Orders::getUserId,currentId);
+		// lqw.eq(currentId != null,Orders::getUserId,currentId);
+		lqw.like(number != null,Orders::getId,number);
+		lqw.between(beginTime != null,Orders::getOrderTime,beginTime,endTime);
 		lqw.orderByDesc(Orders::getOrderTime).orderByDesc(Orders::getNumber);
 
 		orderService.page(ordersPage,lqw);
 
 		return Result.success(ordersPage);
 	}
+
+
+
+	@PutMapping
+	public Result<String> dispatch(@RequestBody Orders orders) {
+		log.info("开始派送订单{}",orders.toString());
+		// LambdaQueryWrapper<Orders> lqw = new LambdaQueryWrapper<>();
+		// lqw.eq(orders.getId() != null,Orders::getId,orders.getId());
+		// lqw.eq(orders.getId() != null,Orders::getId,orders.getId());
+		boolean flag = orderService.updateById(orders);
+		if (flag) return Result.success("订单即将派送");
+
+		return Result.error("派送失败！");
+	}
+
+	// @GetMapping("/page")
+	// public Result<List<Dish>> listResult(int page,int pageSize) {
+	//
+	// 	LambdaQueryWrapper<Dish> lqw = new LambdaQueryWrapper<>();
+	// 	// 查询启售的菜品
+	// 	Page ordersPage = new Page(page,pageSize);
+	// 	Long currentId = BaseContext.getCurrentId();
+	//
+	// 	LambdaQueryWrapper<Orders> lqw = new LambdaQueryWrapper<Orders>();
+	//
+	// 	List<Dish> dishList = dishService.list(lqw);
+	//
+	// 	if (dishList != null) {
+	// 		return Result.success(dishList);
+	// 	}
+	//
+	// 	return Result.error("菜品列表为空");
+	// }
 
 	@GetMapping("/newOrderList")
 	public Result<List<DishDto>> getNewOrderList() {
@@ -171,5 +208,7 @@ public class OrderController {
 		}
 		return dishDtoList;
 	}
+
+
 
 }

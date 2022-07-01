@@ -15,7 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Create by 2022/5/18 17:53
  * description
  */
-// @Slf4j
+@Slf4j
 // @Configuration
 public class InterceptorConfig implements WebMvcConfigurer {
 
@@ -31,10 +31,13 @@ public class InterceptorConfig implements WebMvcConfigurer {
         };
 
         String excludePathPatterns[] = {
-                "/static/backend/page/**",
-                "/static/front/page/**",
+                "/backend/**",
+                "/front/**",
                 "/employee/login",
-                "/employee/logout"
+                "/employee/logout",
+                "/common/**",
+                "/user/sendMsg",
+                "/user/login",
         };
 
         registry.addInterceptor(new LoginInterceptor()).addPathPatterns(addPathPatterns).excludePathPatterns(excludePathPatterns);
@@ -43,12 +46,14 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
 
     // 静态资源映射
-    // @Override
-    // public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    //     log.info("拦截addResourceHandlers");
-    //     registry.addResourceHandler("/**").addResourceLocations("classpath:static/**");
-    //     WebMvcConfigurer.super.addResourceHandlers(registry);
-    // }
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        log.info("拦截addResourceHandlers");
+        registry.addResourceHandler("/**").addResourceLocations("classpath:static/");
+        // WebMvcConfigurer.super.addResourceHandlers(registry);
+        // registry.addResourceHandler("/**").addResourceLocations("classpath:/static/")
+        //         .addResourceLocations("/resources/");
+    }
 
     // @Override
     // public void addViewControllers(ViewControllerRegistry registry) {

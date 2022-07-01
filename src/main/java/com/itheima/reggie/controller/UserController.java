@@ -123,12 +123,6 @@ public class UserController {
 		return Result.error("验证码已失效或错误");
 	}
 
-	@PostMapping("/logout")
-	public Result<String> logout(HttpServletRequest req) {
-		// req.getSession().removeAttribute("user");
-		req.getSession().invalidate();
-		return Result.success("已退出登录");
-	}
 
 
 
@@ -196,4 +190,11 @@ public class UserController {
 	// 	}
 	// 	return Result.error("验证码已失效或错误");
 	// }
+
+	@PostMapping("/logout")
+	public Result<String> logout(HttpServletRequest req) {
+		// req.getSession().removeAttribute("user");
+		req.getSession().invalidate();
+		return Result.success("已退出登录");
+	}
 }
